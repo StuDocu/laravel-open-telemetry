@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Watchers;
 
 use Illuminate\Database\Events\QueryExecuted;
@@ -9,9 +11,9 @@ use Spatie\OpenTelemetry\Facades\Measure;
 
 class QueryWatcher extends Watcher
 {
-    public function register(Application $app)
+    public function register(Application $app): void
     {
-        DB::listen(function (QueryExecuted $query) {
+        DB::listen(static function (QueryExecuted $query): void {
             $queryTimeInMs = $query->time;
 
             Measure::manual('query', $queryTimeInMs, [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Actions;
 
 use Illuminate\Contracts\Queue\Job;
@@ -10,6 +12,11 @@ use ReflectionClass;
 use Spatie\OpenTelemetry\Facades\Measure;
 use Spatie\OpenTelemetry\Jobs\NotTraceAware;
 use Spatie\OpenTelemetry\Jobs\TraceAware;
+
+use function app;
+use function array_key_exists;
+use function config;
+use function in_array;
 
 class MakeQueueTraceAwareAction
 {
@@ -43,7 +50,7 @@ class MakeQueueTraceAwareAction
 
     protected function listenForJobsBeingProcessed(): self
     {
-        app('events')->listen(JobProcessing::class, function (JobProcessing $event) {
+        app('events')->listen(JobProcessing::class, function (JobProcessing $event): void {
             if (! array_key_exists('traceId', $event->job->payload())) {
                 return;
             }
@@ -52,9 +59,11 @@ class MakeQueueTraceAwareAction
 
             Measure::trace()?->setId($traceId);
 
-            if (config('open-telemetry.queue.all_jobs_auto_start_a_span')) {
-                $this->startSpanForJob($event->job);
+            if (! config('open-telemetry.queue.all_jobs_auto_start_a_span')) {
+                return;
             }
+
+            $this->startSpanForJob($event->job);
         });
 
         return $this;
@@ -62,7 +71,7 @@ class MakeQueueTraceAwareAction
 
     public function listenForProcessedJobs(): self
     {
-        app('events')->listen(JobProcessed::class, function (JobProcessed $event) {
+        app('events')->listen(JobProcessed::class, function (JobProcessed $event): void {
             if (! config('open-telemetry.queue.all_jobs_auto_start_a_span')) {
                 return;
             }
@@ -77,7 +86,7 @@ class MakeQueueTraceAwareAction
 
     protected function listenForJobsRetryRequested(): self
     {
-        app('events')->listen(JobRetryRequested::class, function (JobRetryRequested $event) {
+        app('events')->listen(JobRetryRequested::class, static function (JobRetryRequested $event): void {
             if (! array_key_exists('traceId', $event->payload())) {
                 return;
             }
@@ -113,7 +122,7 @@ class MakeQueueTraceAwareAction
         return config('open-telemetry.queue.all_jobs_are_trace_aware_by_default') === true;
     }
 
-    protected function getEventPayload($event): ?array
+    protected function getEventPayload($event): array|null
     {
         return match (true) {
             $event instanceof JobProcessing => $event->job->payload(),
@@ -122,7 +131,7 @@ class MakeQueueTraceAwareAction
         };
     }
 
-    protected function startSpanForJob(Job $job)
+    protected function startSpanForJob(Job $job): void
     {
         $jobName = $this->jobName($job);
 

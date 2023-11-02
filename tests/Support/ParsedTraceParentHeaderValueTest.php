@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Spatie\OpenTelemetry\Support\ParsedTraceParentHeaderValue;
 
 it('can parse a correct header value', function () {

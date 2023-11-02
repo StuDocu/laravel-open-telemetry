@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Support\Samplers;
 
-class NeverSampler extends Sampler
+class NeverSampler implements Sampler
 {
-    public function shouldSample()
+    public function shouldSample(): bool
     {
         return false;
     }

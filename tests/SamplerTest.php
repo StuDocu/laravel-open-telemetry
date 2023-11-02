@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Spatie\OpenTelemetry\Support\Samplers\AlwaysSampler;
 use Spatie\OpenTelemetry\Support\Samplers\LotterySampler;
 use Spatie\OpenTelemetry\Support\Samplers\NeverSampler;

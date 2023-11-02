@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
 use Spatie\OpenTelemetry\Facades\Measure;
 use Spatie\OpenTelemetry\Http\Middleware\ContinueTrace;
 
 beforeEach(function () {
-    Route::any('test-route', fn () => Measure::hasTraceId()
+    Route::any('test-route', static fn () => Measure::hasTraceId()
         ? Measure::traceId()
-        : 'did not start trace'
-    )->middleware(ContinueTrace::class);
+        : 'did not start trace')->middleware(ContinueTrace::class);
 });
 
 it('will continue a trace when the traceparent header is set to a valid value', function () {

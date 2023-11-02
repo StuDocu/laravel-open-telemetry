@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Spatie\OpenTelemetry\Facades\Measure;
@@ -22,6 +24,8 @@ it('can measure a single span', function () {
 
     Measure::stop('first');
 
+    Measure::send();
+
     $payloads = $this->sentRequestPayloads();
 
     assertMatchesSnapshot($payloads);
@@ -41,6 +45,8 @@ it('can measure multiple spans', function () {
     TestTime::addSecond();
 
     Measure::stop('second');
+
+    Measure::send();
 
     $payloads = $this->sentRequestPayloads();
 
@@ -62,6 +68,8 @@ it('can measure nested spans', function () {
 
     Measure::stop('parent');
 
+    Measure::send();
+
     $payloads = $this->sentRequestPayloads();
 
     assertMatchesSnapshot($payloads);
@@ -76,17 +84,19 @@ it('will not send any payloads when we are not sampling', function () {
 
     Measure::stop('my-measure');
 
+    Measure::send();
+
     $payloads = $this->sentRequestPayloads();
 
     expect($payloads['sentSpans'])->toHaveCount(0);
 });
 
 it('can accept extra merge fields when starting a span that will be added to the sent span', function () {
-    Measure::start('my-measure', [
-        'extraName' => 'extraValue',
-    ]);
+    Measure::start('my-measure', ['extraName' => 'extraValue']);
 
     Measure::stop('my-measure');
+
+    Measure::send();
 
     $payloads = $this->sentRequestPayloads();
 
@@ -94,14 +104,14 @@ it('can accept extra merge fields when starting a span that will be added to the
 });
 
 it('can accept extra merge fields when ending a span that will be merge to the sent span', function () {
-    Measure::start('my-measure', [
-        'extraName' => 'extraValue',
-    ]);
+    Measure::start('my-measure', ['extraName' => 'extraValue']);
 
     Measure::stop('my-measure', [
         'extraName' => 'extraValueOverridden',
         'another' => 'anotherValue',
     ]);
+
+    Measure::send();
 
     $payloads = $this->sentRequestPayloads();
 

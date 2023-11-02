@@ -24,18 +24,18 @@ return [
     'sampler' => Spatie\OpenTelemetry\Support\Samplers\AlwaysSampler::class,
 
     /*
-     * Tags can be added to any measurement. These classes will determine the
-     * values of the tags when a new trace starts.
+     * Attributes can be added to any measurement. These classes will determine the
+     * values of the attributes when a new trace starts.
      */
-    'trace_tag_providers' => [
-        \Spatie\OpenTelemetry\Support\TagProviders\DefaultTagsProvider::class,
+    'trace_attribute_providers' => [
+        \Spatie\OpenTelemetry\Support\AttributeProviders\DefaultAttributeProvider::class,
     ],
 
     /*
-     * Tags can be added to any measurement. These classes will determine the
-     * values of the tags when a new span starts.
+     * Attributes can be added to any measurement. These classes will determine the
+     * values of the attributes when a new span starts.
      */
-    'span_tag_providers' => [
+    'span_attribute_providers' => [
 
     ],
 

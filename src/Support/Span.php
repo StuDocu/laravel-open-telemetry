@@ -1,59 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Support;
 
-use Spatie\OpenTelemetry\Support\TagProviders\TagProvider;
+use Spatie\OpenTelemetry\Support\AttributeProviders\AttributeProvider;
+
+use function app;
+use function array_merge;
+use function collect;
 
 class Span
 {
-    protected Stopwatch $stopWatch;
+    public readonly Stopwatch $stopWatch;
 
-    protected string $id;
-
-    protected int $flags;
+    public readonly string $id;
 
     /** @var array<string, mixed> */
-    protected array $tags;
-
-    /** @var array<string, mixed> */
-    public array $mergeProperties;
+    private array $attributes;
 
     /**
-     * @param  array<\Spatie\OpenTelemetry\Support\TagProviders\TagProvider>  $tagProviders
+     * @param array<AttributeProvider> $attributeProviders
+     * @param array<string, scalar>    $attributes         Custom key-value attributes to be attached to the span.
      */
     public function __construct(
-        protected string $name,
-        protected Trace $trace,
-        protected array $tagProviders,
-        protected ?Span $parentSpan = null,
-        array $mergeProperties = [],
-
+        public readonly string $name,
+        public readonly Trace $trace,
+        public readonly array $attributeProviders,
+        public readonly Span|null $parentSpan = null,
+        private array $attributes = [],
     ) {
         $this->stopWatch = app(Stopwatch::class)->start();
 
-        $this->id ??= app(IdGenerator::class)->spanId();
+        $this->id = app(IdGenerator::class)->spanId();
 
-        $this->tags = collect($this->tagProviders)
-            ->map(fn (string $tagProvider) => app($tagProvider))
-            ->flatMap(fn (TagProvider $tagProvider) => $tagProvider->tags())
+        $this->attributes = collect($this->attributeProviders)
+            ->map(static fn (string $attributeProvider) => app($attributeProvider))
+            ->flatMap(static fn (AttributeProvider $attributeProvider) => $attributeProvider->attributes())
             ->toArray();
-
-        $this->mergeProperties = $mergeProperties;
-    }
-
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    public function parentSpan(): ?Span
-    {
-        return $this->parentSpan;
-    }
-
-    public function trace(): ?Trace
-    {
-        return $this->trace;
     }
 
     public function flags(): int
@@ -61,44 +45,36 @@ class Span
         return 0x01;
     }
 
-    public function stop(array $mergeProperties = []): self
+    /** @param array<string, scalar> $attributes */
+    public function stop(array $attributes = []): self
     {
         $this->stopWatch->stop();
 
-        $this->mergeProperties = array_merge($this->mergeProperties, $mergeProperties);
+        $this->attributes = array_merge($this->attributes, $attributes);
 
         return $this;
     }
 
-    public function tags(array $tags): self
+    /** @param array<string, scalar> $attributes */
+    public function attributes(array $attributes): self
     {
-        $this->tags = array_merge($this->tags, $tags);
+        $this->attributes = array_merge($this->attributes, $attributes);
 
         return $this;
     }
 
-    public function getTags(): array
+    /** @return array<string, scalar> */
+    public function getAttributes(): array
     {
         return array_merge(
-            $this->trace->getTags(),
-            $this->tags,
+            $this->trace->getAttributes(),
+            $this->attributes,
         );
     }
 
-    public function toArray(): array
+    /** @return array<string, scalar> */
+    public function getAttributes(): array
     {
-        return array_merge([
-            'id' => $this->id,
-            'traceId' => $this->trace->id(),
-            'localEndpoint' => [
-                'serviceName' => $this->trace->getName(),
-            ],
-            'name' => $this->name,
-            'timestamp' => $this->stopWatch->startTime(),
-            'duration' => $this->stopWatch->elapsedTime(),
-            'tags' => $this->getTags(),
-            'parentId' => $this->parentSpan?->id(),
-            'otel.scope.name' => $this->trace->getName(),
-        ], $this->mergeProperties);
+        return $this->attributes;
     }
 }

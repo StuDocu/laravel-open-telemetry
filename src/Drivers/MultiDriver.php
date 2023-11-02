@@ -1,8 +1,8 @@
 <?php
 
-namespace Spatie\OpenTelemetry\Drivers;
+declare(strict_types=1);
 
-use Spatie\OpenTelemetry\Support\Span;
+namespace Spatie\OpenTelemetry\Drivers;
 
 class MultiDriver implements Driver
 {
@@ -16,17 +16,10 @@ class MultiDriver implements Driver
         return $this;
     }
 
-    public function sendSpan(Span $span): self
+    public function sendSpans(array $spans): void
     {
         foreach ($this->drivers as $driver) {
-            $driver->sendSpan($span);
+            $driver->sendSpans($spans);
         }
-
-        return $this;
-    }
-
-    public function configure(array $options): Driver
-    {
-        return $this;
     }
 }

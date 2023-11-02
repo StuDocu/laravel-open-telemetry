@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Support\Samplers;
 
 use Illuminate\Support\Lottery;
 
-class LotterySampler extends Sampler
+class LotterySampler implements Sampler
 {
     public function shouldSample(): bool
     {

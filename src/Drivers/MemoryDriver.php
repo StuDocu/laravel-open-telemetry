@@ -1,28 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Drivers;
 
 use Spatie\OpenTelemetry\Support\Span;
+
+use function collect;
 
 class MemoryDriver implements Driver
 {
     /** @var array<int, Span> */
     public array $sentSpans = [];
 
-    public function sendSpan(Span $span)
+    public function sendSpans(array $spans): void
     {
-        $this->sentSpans[] = $span;
-    }
-
-    public function configure(array $options): Driver
-    {
-        return $this;
+        $this->sentSpans += $spans;
     }
 
     public function allPayloads(): array
     {
         return [
-            'sentSpans' => collect($this->sentSpans)->map->toArray()->toArray(),
+            'sentSpans' => collect($this->sentSpans)->map->toArray(),
         ];
     }
 }

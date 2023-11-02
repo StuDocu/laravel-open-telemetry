@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Drivers;
 
 use Illuminate\Support\Facades\Http;
-use Spatie\OpenTelemetry\Support\Span;
+
+use function collect;
 
 class RayDriver extends HttpDriver
 {
     protected array $options = [];
 
-    public function sendSpan(Span $span)
+    public function sendSpans(array $spans): void
     {
-        $payload = [$span->toArray()];
+        $payload = collect($spans)->map->toArray();
 
         Http::asJson()->post($this->options['url'] ?? 'http://localhost:23517/otel', $payload);
     }

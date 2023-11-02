@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Spatie\OpenTelemetry\Facades\Measure;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeSpanTagProvider;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeTraceTagProvider;
@@ -14,6 +16,8 @@ it('can add extra tags on the trace level', function () {
 
     Measure::start('second');
     Measure::stop('second');
+
+    Measure::send();
 
     $payloads = $this->sentRequestPayloads()['sentSpans'];
 
@@ -34,6 +38,8 @@ it('can add extra tags on the span level', function () {
     Measure::start('second');
     Measure::stop('second');
 
+    Measure::send();
+
     $payloads = $this->sentRequestPayloads()['sentSpans'];
 
     expect($payloads[0]['tags']['my-span-tag'])->toBeString()
@@ -50,6 +56,8 @@ it('can add tags on a span', function () {
 
     Measure::start('second');
     Measure::stop('second');
+
+    Measure::send();
 
     $payloads = $this->sentRequestPayloads()['sentSpans'];
 

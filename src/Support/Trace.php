@@ -1,36 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Support;
 
-use Spatie\OpenTelemetry\Support\TagProviders\TagProvider;
+use Spatie\OpenTelemetry\Support\AttributeProviders\AttributeProvider;
+
+use function app;
+use function collect;
+use function config;
 
 class Trace
 {
     /** @var array<string, mixed> */
-    protected array $tags = [];
-
-    public static function start(?string $id = null, string $name = ''): self
+    protected array $attributes = [];
+    
+    public static function start(string|null $id = null, string $name = ''): self
     {
-        return new self($id, $name, config('open-telemetry.trace_tag_providers'));
+        return new self($id, $name, config('open-telemetry.trace_attribute_providers'));
     }
 
-    /**
-     * @param  array<\Spatie\OpenTelemetry\Support\TagProviders\TagProvider>  $tagProviders
-     */
+    /** @param  array<AttributeProvider> $attributeProviders */
     public function __construct(
-        protected ?string $id,
-        protected ?string $name,
-        array $tagProviders,
+        protected string|null $id,
+        protected string|null $name,
+        array $attributeProviders,
     ) {
         $this->id ??= app(IdGenerator::class)->traceId();
 
-        $this->tags = collect($tagProviders)
-            ->map(fn (string $tagProvider) => app($tagProvider))
-            ->flatMap(fn (TagProvider $tagProvider) => $tagProvider->tags())
+        $this->attributes = collect($attributeProviders)
+            ->map(static fn (string $attributeProvider) => app($attributeProvider))
+            ->flatMap(static fn (AttributeProvider $attributeProvider) => $attributeProvider->attributes())
             ->toArray();
     }
 
-    public function setId(string $traceId)
+    public function setId(string $traceId): void
     {
         $this->id = $traceId;
     }
@@ -52,8 +56,8 @@ class Trace
         return $this->name;
     }
 
-    public function getTags(): array
+    public function getAttributes(): array
     {
-        return $this->tags ?? [];
+        return $this->attributes;
     }
 }

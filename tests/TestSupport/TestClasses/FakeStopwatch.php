@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Tests\TestSupport\TestClasses;
 
 use Carbon\Carbon;
@@ -9,14 +11,14 @@ class FakeStopwatch extends Stopwatch
 {
     public function start(): self
     {
-        $this->startTime = Carbon::now()->timestamp;
+        $this->startTime = Carbon::now();
 
         return $this;
     }
 
     public function stop(): self
     {
-        $this->stopTime = Carbon::now()->timestamp;
+        $this->stopTime = Carbon::now();
 
         return $this;
     }

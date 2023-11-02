@@ -1,36 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Drivers;
 
 use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Http;
-use Spatie\OpenTelemetry\Support\Span;
+use Spatie\OpenTelemetry\Support\Formatters\SpanFormatter;
+
+use function array_key_exists;
 
 class HttpDriver implements Driver
 {
-    protected array $options = [];
-
-    public function sendSpan(Span $span)
+    /** @param array{headers?: array<string, string>, basic_auth?: array{username: string, password: string}, url: string} $options */
+    public function __construct(private readonly SpanFormatter $spanFormatter, private readonly array $options)
     {
-        $payload = [$span->toArray()];
+    }
 
-        $promise = Http::async()->asJson()
+    public function sendSpans(array $spans): void
+    {
+        $payload = $this->spanFormatter->format($spans);
+
+        Http::asJson()
             ->withHeaders($this->options['headers'] ?? [])
-            ->when(isset($this->options['basic_auth']), function (Factory $client) {
+            ->when(array_key_exists('basic_auth', $this->options), function (Factory $client): void {
                 $client->withBasicAuth(
                     $this->options['basic_auth']['username'],
                     $this->options['basic_auth']['password'],
                 );
             })
             ->post($this->options['url'], $payload);
-
-        $promise->wait();
-    }
-
-    public function configure(array $options): Driver
-    {
-        $this->options = $options;
-
-        return $this;
     }
 }
