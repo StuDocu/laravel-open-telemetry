@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spatie\OpenTelemetry\Support;
 
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use Spatie\OpenTelemetry\Support\AttributeProviders\AttributeProvider;
 
 use function app;
@@ -12,9 +13,9 @@ use function collect;
 
 class Span
 {
-    public readonly Stopwatch $stopWatch;
-
     public readonly string $id;
+
+    private int|null $endTime = null;
 
     /**
      * @param array<AttributeProvider> $attributeProviders
@@ -25,9 +26,10 @@ class Span
         public readonly Trace $trace,
         public readonly array $attributeProviders,
         public readonly Span|null $parentSpan = null,
+        private int|null $startTime = null,
         private array $attributes = [],
     ) {
-        $this->stopWatch = app(Stopwatch::class)->start();
+        $this->startTime = $startTime ?? ClockFactory::getDefault()->now();
 
         $this->id = app(IdGenerator::class)->spanId();
 
@@ -45,7 +47,7 @@ class Span
     /** @param array<string, scalar> $attributes */
     public function stop(array $attributes = []): self
     {
-        $this->stopWatch->stop();
+        $this->endTime = ClockFactory::getDefault()->now();
 
         $this->attributes = array_merge($this->attributes, $attributes);
 
@@ -64,5 +66,15 @@ class Span
     public function getAttributes(): array
     {
         return $this->attributes;
+    }
+
+    public function getStartTime(): int|null
+    {
+        return $this->startTime;
+    }
+
+    public function getEndTime(): int|null
+    {
+        return $this->endTime;
     }
 }

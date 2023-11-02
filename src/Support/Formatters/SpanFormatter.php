@@ -68,8 +68,8 @@ class SpanFormatter
             'spanId' => $span->id,
             'parentSpanId' => $span->parentSpan?->id ?? '',
             'name' => $span->name,
-            'startTimeUnixNano' => $span->stopWatch->startTime()?->getPreciseTimestamp() * 1_000,
-            'endTimeUnixNano' => $span->stopWatch->stopTime()?->getPreciseTimestamp() * 1_000,
+            'startTimeUnixNano' => $span->getStartTime(),
+            'endTimeUnixNano' => $span->getEndTime(),
             'kind' => 2, // Defaults to 2 which is server
         ];
 

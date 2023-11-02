@@ -15,6 +15,7 @@ use Spatie\OpenTelemetry\Support\IdGenerator;
 use Spatie\OpenTelemetry\Support\Measure;
 use Spatie\OpenTelemetry\Support\Samplers\Sampler;
 use Spatie\OpenTelemetry\Support\Stopwatch;
+use Spatie\OpenTelemetry\Watchers\Watcher;
 
 use function app;
 use function collect;
@@ -54,6 +55,11 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
             $action = app(config('open-telemetry.actions.make_queue_trace_aware'));
 
             $action->execute();
+        }
+
+        /** @var Watcher $watcher */
+        foreach (config('open-telemetry.watchers') as $watcher) {
+            app($watcher)->register($this->app);
         }
 
         $this->addWithTraceMacro();
