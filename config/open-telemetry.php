@@ -17,6 +17,11 @@ return [
         ],
     ],
 
+    'watchers' => [
+        Spatie\OpenTelemetry\Watchers\QueryWatcher::class,
+
+    ],
+
     /*
      * This class determines if your measurements should actually be sent
      * to the reporting drivers.

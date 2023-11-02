@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Spatie\OpenTelemetry\Support;
 
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use Spatie\OpenTelemetry\Drivers\Driver;
 
 use function array_keys;
-use function array_merge;
 use function config;
-use function now;
 
 class Measure
 {
@@ -80,7 +79,8 @@ class Measure
         return $this->trace;
     }
 
-    public function start(string $name, array $mergeProperties = []): Span|null
+    /** @param array<string, mixed> $attributes */
+    public function start(string $name, int|null $starTime = null, array $attributes = []): Span|null
     {
         if (! $this->shouldSample) {
             return null;
@@ -91,7 +91,8 @@ class Measure
             $this->trace,
             config('open-telemetry.span_attribute_providers'),
             $this->parentSpan,
-            $mergeProperties,
+            $starTime,
+            $attributes,
         );
 
         $this->startedSpans[$name] = $span;
@@ -116,7 +117,8 @@ class Measure
         return array_keys($this->startedSpans);
     }
 
-    public function stop(string $name, array $mergeProperties = []): Span|null
+    /** @param array<string, mixed> $attributes */
+    public function stop(string $name, array $attributes = []): Span|null
     {
         if (! $this->shouldSample) {
             return null;
@@ -128,7 +130,7 @@ class Measure
             return null;
         }
 
-        $span->stop($mergeProperties);
+        $span->stop($attributes);
 
         unset($this->startedSpans[$name]);
         $this->parentSpan = $span->parentSpan;
@@ -149,21 +151,13 @@ class Measure
         return true;
     }
 
-    public function manual(string $name, float $durationInMs, array $mergeProperties = []): void
+    /** @param array<string, mixed> $attributes */
+    public function manual(string $name, int $durationInNs, array $attributes = []): void
     {
-        $this->start($name);
+        $nowInNs = ClockFactory::getDefault()->now();
 
-        $endTime = now()->getPreciseTimestamp();
+        $this->start($name, $nowInNs - $durationInNs, $attributes);
 
-        $durationInMicroseconds = $durationInMs * 1000;
-
-        $startTime = $endTime - $durationInMicroseconds;
-
-        $mergeProperties = array_merge([
-            'timestamp' => $startTime,
-            'duration' => $durationInMicroseconds,
-        ], $mergeProperties);
-
-        $this->stop($name, $mergeProperties);
+        $this->stop($name, $attributes);
     }
 }
