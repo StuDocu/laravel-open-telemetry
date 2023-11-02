@@ -131,7 +131,7 @@ class Measure
         $span->stop($mergeProperties);
 
         unset($this->startedSpans[$name]);
-        $this->parentSpan = $span->parentSpan();
+        $this->parentSpan = $span->parentSpan;
 
         $this->spansToSend[] = $span;
 
