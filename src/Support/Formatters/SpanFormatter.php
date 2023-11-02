@@ -24,8 +24,8 @@ class SpanFormatter
             return '';
         }
 
-        $serviceName = $spans[0]->trace->getAttributes()['service.name'];
-        $scopeName   = $spans[0]->getAttributes()['scope.name'];
+        $serviceName = $spans[0]->trace->getAttributes()['service.name'] ?? 'backend';
+        $scopeName   = $spans[0]->getAttributes()['scope.name'] ?? 'scope-name';
 
         $formattedSpans = array_map(fn (Span $span) => $this->formatSpan($span), $spans);
 
