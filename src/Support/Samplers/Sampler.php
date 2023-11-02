@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Support\Samplers;
 
-abstract class Sampler
+interface Sampler
 {
-    abstract public function shouldSample();
+    public function shouldSample(): bool;
 }

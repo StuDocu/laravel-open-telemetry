@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Watchers;
 
 use Illuminate\Foundation\Application;
@@ -9,13 +11,13 @@ use Illuminate\Support\Facades\Event;
 
 class HttpClientWatcher extends Watcher
 {
-    public function register(Application $app)
+    public function register(Application $app): void
     {
-        Event::listen(RequestSending::class, function (RequestSending $event) {
+        Event::listen(RequestSending::class, static function (RequestSending $event): void {
             // to do implement
         });
 
-        Event::listen(ResponseReceived::class, function (ResponseReceived $event) {
+        Event::listen(ResponseReceived::class, static function (ResponseReceived $event): void {
             // to do implement
         });
     }

@@ -1,29 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Support;
 
 use Spatie\OpenTelemetry\Drivers\Driver;
 
+use function array_keys;
+use function array_merge;
+use function config;
+use function now;
+
 class Measure
 {
-    protected Driver $driver;
+    protected Trace|null $trace = null;
 
-    protected ?Trace $trace = null;
+    protected Span|null $parentSpan = null;
 
-    protected ?Span $parentSpan = null;
-
-    /** @var array<string, \Spatie\OpenTelemetry\Support\Span> */
+    /** @var array<string, Span> */
     protected array $startedSpans = [];
 
-    protected bool $shouldSample = true;
+    /** @var list<Span> */
+    protected array $spansToSend = [];
 
-    public function __construct(Driver $driver, bool $shouldSample = true)
+    public function __construct(private Driver $driver, private readonly bool $shouldSample = true)
     {
         $this->startTrace();
-
-        $this->driver = $driver;
-
-        $this->shouldSample = $shouldSample;
     }
 
     public function startTrace(): self
@@ -39,7 +41,7 @@ class Measure
         return $this;
     }
 
-    public function traceId(): ?string
+    public function traceId(): string|null
     {
         return $this->trace?->id();
     }
@@ -48,14 +50,14 @@ class Measure
     {
         $traceId = $this->traceId();
 
-        if (is_null($traceId)) {
+        if ($traceId === null) {
             return false;
         }
 
         return $traceId !== '0';
     }
 
-    public function setTraceId(string $traceId)
+    public function setTraceId(string $traceId): self
     {
         if (! $this->trace) {
             return $this;
@@ -73,12 +75,12 @@ class Measure
         return $this;
     }
 
-    public function trace(): ?Trace
+    public function trace(): Trace|null
     {
         return $this->trace;
     }
 
-    public function start(string $name, array $mergeProperties = []): ?Span
+    public function start(string $name, array $mergeProperties = []): Span|null
     {
         if (! $this->shouldSample) {
             return null;
@@ -87,7 +89,7 @@ class Measure
         $span = new Span(
             $name,
             $this->trace,
-            config('open-telemetry.span_tag_providers'),
+            config('open-telemetry.span_attribute_providers'),
             $this->parentSpan,
             $mergeProperties,
         );
@@ -99,12 +101,12 @@ class Measure
         return $span;
     }
 
-    public function getSpan(string $name): ?Span
+    public function getSpan(string $name): Span|null
     {
         return $this->startedSpans[$name] ?? null;
     }
 
-    public function currentSpan(): ?Span
+    public function currentSpan(): Span|null
     {
         return $this->parentSpan;
     }
@@ -114,7 +116,7 @@ class Measure
         return array_keys($this->startedSpans);
     }
 
-    public function stop(string $name, array $mergeProperties = []): ?Span
+    public function stop(string $name, array $mergeProperties = []): Span|null
     {
         if (! $this->shouldSample) {
             return null;
@@ -131,12 +133,23 @@ class Measure
         unset($this->startedSpans[$name]);
         $this->parentSpan = $span->parentSpan();
 
-        $this->driver->sendSpan($span);
+        $this->spansToSend[] = $span;
 
         return $span;
     }
 
-    public function manual(string $name, float $durationInMs, array $mergeProperties = [])
+    public function send(): bool
+    {
+        if (! $this->shouldSample) {
+            return false;
+        }
+
+        $this->driver->sendSpans($this->spansToSend);
+
+        return true;
+    }
+
+    public function manual(string $name, float $durationInMs, array $mergeProperties = []): void
     {
         $this->start($name);
 

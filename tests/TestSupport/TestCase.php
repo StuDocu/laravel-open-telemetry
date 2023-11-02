@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Tests\TestSupport;
 
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -13,6 +15,8 @@ use Spatie\OpenTelemetry\Support\Stopwatch;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeIdGenerator;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeStopwatch;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeTagsProvider;
+
+use function config;
 
 class TestCase extends Orchestra
 {
@@ -46,7 +50,7 @@ class TestCase extends Orchestra
 
     public function tempFile(string $fileName): string
     {
-        return __DIR__."/temp/{$fileName}";
+        return __DIR__ . "/temp/{$fileName}";
     }
 
     public function sentRequestPayloads(): array

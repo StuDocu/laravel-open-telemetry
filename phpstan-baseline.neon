@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Http\\\\Client\\\\Response\\:\\:wait\\(\\)\\.$#"
-			count: 1
-			path: src/Drivers/HttpDriver.php
-
-		-
 			message: "#^Property Spatie\\\\OpenTelemetry\\\\Support\\\\Stopwatch\\:\\:\\$startTime \\(int\\|null\\) does not accept float\\.$#"
 			count: 1
 			path: src/Support/Stopwatch.php

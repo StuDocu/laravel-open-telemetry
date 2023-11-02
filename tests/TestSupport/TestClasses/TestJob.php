@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Tests\TestSupport\TestClasses;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,11 +13,8 @@ class TestJob implements ShouldQueue
 {
     use InteractsWithQueue;
 
-    public Valuestore $valuestore;
-
-    public function __construct(Valuestore $valuestore)
+    public function __construct(public Valuestore $valuestore)
     {
-        $this->valuestore = $valuestore;
     }
 
     public function handle()

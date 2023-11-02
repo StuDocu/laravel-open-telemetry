@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Tests\TestSupport\TestClasses;
 
 use Spatie\OpenTelemetry\Support\IdGenerator;

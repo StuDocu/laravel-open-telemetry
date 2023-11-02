@@ -1,17 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry;
 
 use Illuminate\Http\Client\PendingRequest;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Spatie\OpenTelemetry\Actions\MakeQueueTraceAwareAction;
 use Spatie\OpenTelemetry\Drivers\Driver;
 use Spatie\OpenTelemetry\Drivers\MultiDriver;
 use Spatie\OpenTelemetry\Support\IdGenerator;
 use Spatie\OpenTelemetry\Support\Measure;
 use Spatie\OpenTelemetry\Support\Samplers\Sampler;
 use Spatie\OpenTelemetry\Support\Stopwatch;
+
+use function app;
+use function collect;
+use function config;
+use function sprintf;
 
 class OpenTelemetryServiceProvider extends PackageServiceProvider
 {
@@ -20,7 +28,7 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-open-telemetry')
             ->hasConfigFile()
-            ->hasInstallCommand(function (InstallCommand $command) {
+            ->hasInstallCommand(static function (InstallCommand $command): void {
                 $command
                     ->publishConfigFile()
                     ->copyAndRegisterServiceProviderInApp()
@@ -28,45 +36,44 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
             });
     }
 
-    public function bootingPackage()
+    public function bootingPackage(): void
     {
         $this->app->bind(Sampler::class, config('open-telemetry.sampler'));
         $this->app->bind(IdGenerator::class, config('open-telemetry.id_generator'));
         $this->app->bind(Stopwatch::class, config('open-telemetry.stopwatch'));
 
         $this->app->singleton(Measure::class, function () {
-            $shouldSample = app(Sampler::class)->shouldSample();
+            $shouldSample          = app(Sampler::class)->shouldSample();
             $configuredMultiDriver = $this->getMultiDriver();
 
             return new Measure($configuredMultiDriver, $shouldSample);
         });
 
         if (config('open-telemetry.queue.make_queue_trace_aware')) {
-            /** @var \Spatie\OpenTelemetry\Actions\MakeQueueTraceAwareAction $action */
+            /** @var MakeQueueTraceAwareAction $action */
             $action = app(config('open-telemetry.actions.make_queue_trace_aware'));
 
             $action->execute();
         }
 
         $this->addWithTraceMacro();
-
-        if (config('open-telemetry.automatically_trace_requests')) {
-            Facades\Measure::start('web-request');
-        }
     }
 
     protected function getMultiDriver(): MultiDriver
     {
         $multiDriver = new MultiDriver();
 
-        collect(config('open-telemetry.drivers'))
-            ->map(function ($value, $key) {
-                $driverClass = $key;
-                $config = $value;
+        /** @var array<class-string<Driver>, array<string, scalar>> $drivers */
+        $drivers = config('open-telemetry.drivers');
 
-                return app($driverClass)->configure($config);
+        collect($drivers)
+            ->map(static function ($value, string $key) {
+                $driverClass = $key;
+                $config      = $value;
+
+                return app($driverClass, ['options' => $config]);
             })
-            ->each(fn (Driver $driver) => $multiDriver->addDriver($driver));
+            ->each(static fn (Driver $driver) => $multiDriver->addDriver($driver));
 
         return $multiDriver;
     }

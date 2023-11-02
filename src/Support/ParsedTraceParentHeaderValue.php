@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Support;
 
 use OpenTelemetry\API\Trace\Propagation\TraceContextValidator;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 
+use function explode;
+use function substr_count;
+
 class ParsedTraceParentHeaderValue
 {
-    public static function make(string $headerValue): ?self
+    public static function make(string $headerValue): self|null
     {
         if (self::isValidHeaderValue($headerValue)) {
             return null;

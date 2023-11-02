@@ -1,49 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spatie\OpenTelemetry\Support;
 
-use Exception;
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
+
+use function now;
 
 class Stopwatch
 {
-    protected ?int $startTime = null;
+    private Carbon|null $startTime = null;
 
-    protected ?int $stopTime = null;
+    private Carbon|null $stopTime = null;
 
     public function start(): self
     {
-        $this->startTime = now()->getPreciseTimestamp();
+        $this->startTime = now();
 
         return $this;
     }
 
     public function stop(): self
     {
-        $this->stopTime = now()->getPreciseTimestamp();
+        $this->stopTime = now();
 
         return $this;
     }
 
-    public function startTime(): int
+    public function startTime(): Carbon|null
     {
         return $this->startTime;
     }
 
-    public function stopTime(): ?int
+    public function stopTime(): Carbon|null
     {
         return $this->stopTime;
     }
 
-    public function elapsedTime(): int
+    public function elapsedTime(): CarbonInterval
     {
-        if (is_null($this->startTime)) {
-            throw new Exception('//TODO: add message');
+        if ($this->startTime === null || $this->stopTime === null) {
+            return new CarbonInterval(0);
         }
 
-        if (is_null($this->stopTime)) {
-            throw new Exception('//TODO: add message');
-        }
-
-        return $this->stopTime - $this->startTime;
+        return $this->stopTime->diffAsCarbonInterval($this->startTime);
     }
 }
