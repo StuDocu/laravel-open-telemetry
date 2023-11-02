@@ -85,8 +85,8 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
                 $headers['traceparent'] = sprintf(
                     '%s-%s-%s-%02x',
                     '00',
-                    $span->trace()->id(),
-                    $span->id(),
+                    $span->trace->id(),
+                    $span->id,
                     $span->flags(),
                 );
 
