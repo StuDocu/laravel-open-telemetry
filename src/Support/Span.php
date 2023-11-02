@@ -16,9 +16,6 @@ class Span
 
     public readonly string $id;
 
-    /** @var array<string, mixed> */
-    private array $attributes;
-
     /**
      * @param array<AttributeProvider> $attributeProviders
      * @param array<string, scalar>    $attributes         Custom key-value attributes to be attached to the span.
@@ -61,15 +58,6 @@ class Span
         $this->attributes = array_merge($this->attributes, $attributes);
 
         return $this;
-    }
-
-    /** @return array<string, scalar> */
-    public function getAttributes(): array
-    {
-        return array_merge(
-            $this->trace->getAttributes(),
-            $this->attributes,
-        );
     }
 
     /** @return array<string, scalar> */
