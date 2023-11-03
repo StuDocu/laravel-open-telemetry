@@ -118,7 +118,7 @@ class Measure
     }
 
     /** @param array<string, mixed> $attributes */
-    public function stop(string $name, array $attributes = []): Span|null
+    public function stop(string $name, int|null $stopTime = null, array $attributes = []): Span|null
     {
         if (! $this->shouldSample) {
             return null;
@@ -130,7 +130,7 @@ class Measure
             return null;
         }
 
-        $span->stop($attributes);
+        $span->stop($stopTime, $attributes);
 
         unset($this->startedSpans[$name]);
         $this->parentSpan = $span->parentSpan;
@@ -158,6 +158,14 @@ class Measure
 
         $this->start($name, $nowInNs - $durationInNs, $attributes);
 
-        $this->stop($name, $attributes);
+        $this->stop($name, attributes: $attributes);
+    }
+
+    /** @param array<string, mixed> $attributes */
+    public function manualStartAndEnd(string $name, int $startTime, int $endTime, array $attributes = []): void
+    {
+        $this->start($name, $startTime, $attributes);
+
+        $this->stop($name, $endTime, $attributes);
     }
 }
