@@ -45,9 +45,9 @@ class Span
     }
 
     /** @param array<string, scalar> $attributes */
-    public function stop(array $attributes = []): self
+    public function stop(int|null $stopTime = null, array $attributes = []): self
     {
-        $this->endTime = ClockFactory::getDefault()->now();
+        $this->endTime = $stopTime ?? ClockFactory::getDefault()->now();
 
         $this->attributes = array_merge($this->attributes, $attributes);
 
