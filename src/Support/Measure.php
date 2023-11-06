@@ -158,7 +158,7 @@ class Measure
 
         $this->start($name, $nowInNs - $durationInNs, $attributes);
 
-        $this->stop($name, attributes: $attributes);
+        $this->stop($name, $nowInNs);
     }
 
     /** @param array<string, mixed> $attributes */
@@ -166,6 +166,6 @@ class Measure
     {
         $this->start($name, $startTime, $attributes);
 
-        $this->stop($name, $endTime, $attributes);
+        $this->stop($name, $endTime);
     }
 }

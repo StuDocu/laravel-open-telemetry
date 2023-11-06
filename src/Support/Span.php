@@ -33,10 +33,10 @@ class Span
 
         $this->id = app(IdGenerator::class)->spanId();
 
-        $this->attributes = collect($this->attributeProviders)
+        $this->attributes = array_merge(collect($this->attributeProviders)
             ->map(static fn (string $attributeProvider) => app($attributeProvider))
             ->flatMap(static fn (AttributeProvider $attributeProvider) => $attributeProvider->attributes())
-            ->toArray();
+            ->toArray(), $attributes);
     }
 
     public function flags(): int
