@@ -11,6 +11,7 @@
 
     <!-- Directories to be checked -->
     <file>src</file>
+    <file>config</file>
     <file>tests</file>
 
     <!-- Include full Doctrine Coding Standard -->

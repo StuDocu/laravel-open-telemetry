@@ -17,7 +17,7 @@ use Spatie\OpenTelemetry\Support\Samplers\Sampler;
 use Spatie\OpenTelemetry\Support\Stopwatch;
 use Spatie\OpenTelemetry\Watchers\Watcher;
 
-use function app;
+use function array_key_first;
 use function collect;
 use function config;
 use function sprintf;
@@ -32,19 +32,23 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
             ->hasInstallCommand(static function (InstallCommand $command): void {
                 $command
                     ->publishConfigFile()
-                    ->copyAndRegisterServiceProviderInApp()
-                    ->askToStarRepoOnGitHub('spatie/laravel-open-telemetry');
+                    ->copyAndRegisterServiceProviderInApp();
             });
     }
 
     public function bootingPackage(): void
     {
-        $this->app->bind(Sampler::class, config('open-telemetry.sampler'));
+        $this->app->singleton(Sampler::class, function () {
+            $sampler = config('open-telemetry.sampler');
+
+            return $this->app->make(array_key_first($sampler), $sampler[array_key_first($sampler)]);
+        });
+
         $this->app->bind(IdGenerator::class, config('open-telemetry.id_generator'));
         $this->app->bind(Stopwatch::class, config('open-telemetry.stopwatch'));
 
         $this->app->singleton(Measure::class, function () {
-            $shouldSample          = app(Sampler::class)->shouldSample();
+            $shouldSample          = $this->app->make(Sampler::class)->shouldSample();
             $configuredMultiDriver = $this->getMultiDriver();
 
             return new Measure($configuredMultiDriver, $shouldSample);
@@ -52,14 +56,14 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
 
         if (config('open-telemetry.queue.make_queue_trace_aware')) {
             /** @var MakeQueueTraceAwareAction $action */
-            $action = app(config('open-telemetry.actions.make_queue_trace_aware'));
+            $action = $this->app->make(config('open-telemetry.actions.make_queue_trace_aware'));
 
             $action->execute();
         }
 
-        /** @var Watcher $watcher */
+        /** @var class-string<Watcher> $watcher */
         foreach (config('open-telemetry.watchers') as $watcher) {
-            app($watcher)->register($this->app);
+            $this->app->make($watcher)->register($this->app);
         }
 
         $this->addWithTraceMacro();
@@ -73,11 +77,11 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
         $drivers = config('open-telemetry.drivers');
 
         collect($drivers)
-            ->map(static function ($value, string $key) {
+            ->map(function ($value, string $key) {
                 $driverClass = $key;
                 $config      = $value;
 
-                return app($driverClass, ['options' => $config]);
+                return $this->app->make($driverClass, ['options' => $config]);
             })
             ->each(static fn (Driver $driver) => $multiDriver->addDriver($driver));
 
@@ -87,7 +91,7 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
     protected function addWithTraceMacro(): self
     {
         PendingRequest::macro('withTrace', function () {
-            if ($span = app(Measure::class)->currentSpan()) {
+            if ($span = $this->app->make(Measure::class)->currentSpan()) {
                 $headers['traceparent'] = sprintf(
                     '%s-%s-%s-%02x',
                     '00',
