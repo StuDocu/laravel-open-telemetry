@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+use Spatie\OpenTelemetry\Actions\MakeQueueTraceAwareAction;
+use Spatie\OpenTelemetry\Drivers\HttpDriver;
+use Spatie\OpenTelemetry\Support\AttributeProviders\DefaultAttributeProvider;
+use Spatie\OpenTelemetry\Support\IdGenerator;
+use Spatie\OpenTelemetry\Support\Samplers\AlwaysSampler;
+use Spatie\OpenTelemetry\Support\Stopwatch;
+
 return [
     /*
      * This value will be sent along with your trace.
@@ -12,37 +21,34 @@ return [
      * A driver is responsible for transmitting any measurements.
      */
     'drivers' => [
-        Spatie\OpenTelemetry\Drivers\HttpDriver::class => [
-            'url' => 'http://localhost:9411/api/v2/spans',
-        ],
+        HttpDriver::class => ['url' => 'http://localhost:9411/api/v2/spans'],
     ],
 
     'watchers' => [
-        Spatie\OpenTelemetry\Watchers\QueryWatcher::class,
-
+        // \Spatie\OpenTelemetry\Watchers\QueryWatcher::class,
     ],
 
     /*
      * This class determines if your measurements should actually be sent
      * to the reporting drivers.
      */
-    'sampler' => Spatie\OpenTelemetry\Support\Samplers\AlwaysSampler::class,
+    'sampler' => [
+        AlwaysSampler::class => [],
+    ],
 
     /*
      * Attributes can be added to any measurement. These classes will determine the
      * values of the attributes when a new trace starts.
      */
     'trace_attribute_providers' => [
-        \Spatie\OpenTelemetry\Support\AttributeProviders\DefaultAttributeProvider::class,
+        DefaultAttributeProvider::class,
     ],
 
     /*
      * Attributes can be added to any measurement. These classes will determine the
      * values of the attributes when a new span starts.
      */
-    'span_attribute_providers' => [
-
-    ],
+    'span_attribute_providers' => [],
 
     'queue' => [
         /*
@@ -68,16 +74,12 @@ return [
          * These jobs will be trace aware even if they don't
          * implement the `TraceAware` interface.
          */
-        'trace_aware_jobs' => [
-
-        ],
+        'trace_aware_jobs' => [],
 
         /*
          * These jobs will never trace aware, regardless of `all_jobs_are_trace_aware_by_default`.
          */
-        'not_trace_aware_jobs' => [
-
-        ],
+        'not_trace_aware_jobs' => [],
     ],
 
     /*
@@ -87,16 +89,16 @@ return [
      * In most cases, you should use the default values.
      */
     'actions' => [
-        'make_queue_trace_aware' => Spatie\OpenTelemetry\Actions\MakeQueueTraceAwareAction::class,
+        'make_queue_trace_aware' => MakeQueueTraceAwareAction::class,
     ],
 
     /*
      * This class determines how the package measures time.
      */
-    'stopwatch' => Spatie\OpenTelemetry\Support\Stopwatch::class,
+    'stopwatch' => Stopwatch::class,
 
     /*
      * This class generates IDs for traces and spans.
      */
-    'id_generator' => Spatie\OpenTelemetry\Support\IdGenerator::class,
+    'id_generator' => IdGenerator::class,
 ];
