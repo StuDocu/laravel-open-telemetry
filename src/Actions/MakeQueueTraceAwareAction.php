@@ -31,7 +31,7 @@ class MakeQueueTraceAwareAction
 
     protected function listenForJobsBeingQueued(): self
     {
-        app('queue')->createPayloadUsing(function ($connectionName, $queue, $payload) {
+        app('queue')->createPayloadUsing(function ($connectionName, $queue, $payload): array {
             $queueable = $payload['data']['command'];
 
             if (! $this->isTraceAware($queueable)) {
@@ -43,6 +43,8 @@ class MakeQueueTraceAwareAction
             if ($currentTraceId) {
                 return ['traceId' => $currentTraceId];
             }
+
+            return [];
         });
 
         return $this;
