@@ -22,6 +22,7 @@ class HttpDriver implements Driver
         $payload = $this->spanFormatter->format($spans);
 
         Http::asJson()
+            ->withBody($payload, 'application/json')
             ->withHeaders($this->options['headers'] ?? [])
             ->when(array_key_exists('basic_auth', $this->options), function (Factory $client): void {
                 $client->withBasicAuth(
@@ -29,6 +30,6 @@ class HttpDriver implements Driver
                     $this->options['basic_auth']['password'],
                 );
             })
-            ->post($this->options['url'], $payload);
+            ->post($this->options['url']);
     }
 }
