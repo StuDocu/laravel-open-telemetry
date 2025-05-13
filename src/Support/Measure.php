@@ -12,9 +12,9 @@ use function config;
 
 class Measure
 {
-    protected Trace|null $trace = null;
+    protected ?Trace $trace = null;
 
-    protected Span|null $parentSpan = null;
+    protected ?Span $parentSpan = null;
 
     /** @var array<string, Span> */
     protected array $startedSpans = [];
@@ -40,7 +40,7 @@ class Measure
         return $this;
     }
 
-    public function traceId(): string|null
+    public function traceId(): ?string
     {
         return $this->trace?->id();
     }
@@ -74,13 +74,13 @@ class Measure
         return $this;
     }
 
-    public function trace(): Trace|null
+    public function trace(): ?Trace
     {
         return $this->trace;
     }
 
     /** @param array<string, mixed> $attributes */
-    public function start(string $name, int|null $starTime = null, array $attributes = []): Span|null
+    public function start(string $name, ?int $starTime = null, array $attributes = []): ?Span
     {
         if (! $this->shouldSample) {
             return null;
@@ -102,12 +102,12 @@ class Measure
         return $span;
     }
 
-    public function getSpan(string $name): Span|null
+    public function getSpan(string $name): ?Span
     {
         return $this->startedSpans[$name] ?? null;
     }
 
-    public function currentSpan(): Span|null
+    public function currentSpan(): ?Span
     {
         return $this->parentSpan;
     }
@@ -118,7 +118,7 @@ class Measure
     }
 
     /** @param array<string, mixed> $attributes */
-    public function stop(string $name, int|null $stopTime = null, array $attributes = []): Span|null
+    public function stop(string $name, ?int $stopTime = null, array $attributes = []): ?Span
     {
         if (! $this->shouldSample) {
             return null;

@@ -16,7 +16,7 @@ class SpanFormatter
      * Format the given spans into a string representation.
      * The result string is in OpenTelemetry protocol HTTP JSON format.
      *
-     * @param list<Span> $spans
+     * @param  list<Span>  $spans
      */
     public function format(array $spans): string
     {

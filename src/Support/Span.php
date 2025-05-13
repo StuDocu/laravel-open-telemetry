@@ -15,7 +15,7 @@ class Span
 {
     public readonly string $id;
 
-    private int|null $endTime = null;
+    private ?int $endTime = null;
 
     /**
      * @param  array<AttributeProvider>  $attributeProviders
@@ -25,8 +25,8 @@ class Span
         public readonly string $name,
         public readonly Trace $trace,
         public readonly array $attributeProviders,
-        public readonly Span|null $parentSpan = null,
-        private int|null $startTime = null,
+        public readonly ?Span $parentSpan = null,
+        private ?int $startTime = null,
         private array $attributes = [],
     ) {
         $this->startTime = $startTime ?? ClockFactory::getDefault()->now();
@@ -45,7 +45,7 @@ class Span
     }
 
     /** @param array<string, scalar> $attributes */
-    public function stop(int|null $stopTime = null, array $attributes = []): self
+    public function stop(?int $stopTime = null, array $attributes = []): self
     {
         $this->endTime = $stopTime ?? ClockFactory::getDefault()->now();
 
@@ -68,12 +68,12 @@ class Span
         return $this->attributes;
     }
 
-    public function getStartTime(): int|null
+    public function getStartTime(): ?int
     {
         return $this->startTime;
     }
 
-    public function getEndTime(): int|null
+    public function getEndTime(): ?int
     {
         return $this->endTime;
     }
