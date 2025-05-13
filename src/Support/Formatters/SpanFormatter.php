@@ -16,7 +16,7 @@ class SpanFormatter
      * Format the given spans into a string representation.
      * The result string is in OpenTelemetry protocol HTTP JSON format.
      *
-     * @param list<Span> $spans
+     * @param  list<Span>  $spans
      */
     public function format(array $spans): string
     {
@@ -25,7 +25,7 @@ class SpanFormatter
         }
 
         $serviceName = $spans[0]->trace->getAttributes()['service.name'] ?? 'backend';
-        $scopeName   = $spans[0]->getAttributes()['scope.name'] ?? 'scope-name';
+        $scopeName = $spans[0]->getAttributes()['scope.name'] ?? 'scope-name';
 
         $formattedSpans = array_map(fn (Span $span) => $this->formatSpan($span), $spans);
 

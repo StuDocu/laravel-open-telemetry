@@ -48,7 +48,7 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
         $this->app->bind(Stopwatch::class, config('open-telemetry.stopwatch'));
 
         $this->app->singleton(Measure::class, function () {
-            $shouldSample          = $this->app->make(Sampler::class)->shouldSample();
+            $shouldSample = $this->app->make(Sampler::class)->shouldSample();
             $configuredMultiDriver = $this->getMultiDriver();
 
             return new Measure($configuredMultiDriver, $shouldSample);
@@ -79,7 +79,7 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
         collect($drivers)
             ->map(function ($value, string $key) {
                 $driverClass = $key;
-                $config      = $value;
+                $config = $value;
 
                 return $this->app->make($driverClass, ['options' => $config]);
             })

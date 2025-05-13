@@ -10,11 +10,9 @@ use Spatie\OpenTelemetry\Support\Formatters\SpanFormatter;
 class FilesystemDriver implements Driver
 {
     /** @param array<string, mixed> $options */
-    public function __construct(private readonly SpanFormatter $spanFormatter, private readonly array $options)
-    {
-    }
+    public function __construct(private readonly SpanFormatter $spanFormatter, private readonly array $options) {}
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function sendSpans(array $spans): void
     {
         $payload = $this->spanFormatter->format($spans);

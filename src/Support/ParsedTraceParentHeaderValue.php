@@ -12,7 +12,7 @@ use function substr_count;
 
 class ParsedTraceParentHeaderValue
 {
-    public static function make(string $headerValue): self|null
+    public static function make(string $headerValue): ?self
     {
         if (self::isValidHeaderValue($headerValue)) {
             return null;

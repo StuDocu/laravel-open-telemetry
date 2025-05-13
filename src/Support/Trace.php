@@ -14,16 +14,16 @@ class Trace
 {
     /** @var array<string, mixed> */
     protected array $attributes = [];
-    
-    public static function start(string|null $id = null, string $name = ''): self
+
+    public static function start(?string $id = null, string $name = ''): self
     {
         return new self($id, $name, config('open-telemetry.trace_attribute_providers'));
     }
 
     /** @param  array<AttributeProvider> $attributeProviders */
     public function __construct(
-        protected string|null $id,
-        protected string|null $name,
+        protected ?string $id,
+        protected ?string $name,
         array $attributeProviders,
     ) {
         $this->id ??= app(IdGenerator::class)->traceId();

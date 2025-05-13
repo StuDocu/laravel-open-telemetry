@@ -124,7 +124,7 @@ class MakeQueueTraceAwareAction
         return config('open-telemetry.queue.all_jobs_are_trace_aware_by_default') === true;
     }
 
-    protected function getEventPayload($event): array|null
+    protected function getEventPayload($event): ?array
     {
         return match (true) {
             $event instanceof JobProcessing => $event->job->payload(),
