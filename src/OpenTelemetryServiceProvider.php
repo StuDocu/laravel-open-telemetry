@@ -79,7 +79,7 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
         collect($drivers)
             ->map(function ($value, string $key) {
                 $driverClass = $key;
-                $config = $value;
+                $config      = $value;
 
                 return $this->app->make($driverClass, ['options' => $config]);
             })

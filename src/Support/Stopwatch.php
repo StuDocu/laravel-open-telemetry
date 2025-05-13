@@ -11,9 +11,9 @@ use function now;
 
 class Stopwatch
 {
-    private ?Carbon $startTime = null;
+    private Carbon|null $startTime = null;
 
-    private ?Carbon $stopTime = null;
+    private Carbon|null $stopTime = null;
 
     public function start(): self
     {
@@ -29,12 +29,12 @@ class Stopwatch
         return $this;
     }
 
-    public function startTime(): ?Carbon
+    public function startTime(): Carbon|null
     {
         return $this->startTime;
     }
 
-    public function stopTime(): ?Carbon
+    public function stopTime(): Carbon|null
     {
         return $this->stopTime;
     }
