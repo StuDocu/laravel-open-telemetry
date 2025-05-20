@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Spatie\OpenTelemetry\Facades\Measure;
 use Spatie\OpenTelemetry\Support\Samplers\NeverSampler;
