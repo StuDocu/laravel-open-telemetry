@@ -91,7 +91,7 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
     protected function addWithTraceMacro(): self
     {
         PendingRequest::macro('withTrace', function () {
-            if ($span = $this->app->make(Measure::class)->currentSpan()) {
+            if ($span = app(Measure::class)->currentSpan()) {
                 $headers['traceparent'] = sprintf(
                     '%s-%s-%s-%02x',
                     '00',
