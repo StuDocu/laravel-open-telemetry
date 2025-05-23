@@ -36,7 +36,7 @@ class TestCase extends Orchestra
         $this->app->bind(Stopwatch::class, config('open-telemetry.stopwatch'));
         $this->app->bind(Sampler::class, AlwaysSampler::class);
 
-        $this->memoryDriver = new MemoryDriver();
+        $this->memoryDriver = new MemoryDriver;
 
         Measure::setDriver($this->memoryDriver);
     }
@@ -50,7 +50,7 @@ class TestCase extends Orchestra
 
     public function tempFile(string $fileName): string
     {
-        return __DIR__ . "/temp/{$fileName}";
+        return __DIR__."/temp/{$fileName}";
     }
 
     public function sentRequestPayloads(): array

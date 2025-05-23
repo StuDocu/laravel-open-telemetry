@@ -13,9 +13,7 @@ use function array_key_exists;
 class HttpDriver implements Driver
 {
     /** @param array{headers?: array<string, string>, basic_auth?: array{username: string, password: string}, url: string} $options */
-    public function __construct(private readonly SpanFormatter $spanFormatter, private readonly array $options)
-    {
-    }
+    public function __construct(private readonly SpanFormatter $spanFormatter, private readonly array $options) {}
 
     public function sendSpans(array $spans): void
     {

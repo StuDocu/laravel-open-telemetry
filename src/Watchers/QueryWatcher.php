@@ -27,7 +27,7 @@ class QueryWatcher extends Watcher
                 TraceAttributes::DB_STATEMENT => $query->sql,
             ];
 
-            Measure::manual('database query - ' . $operationName, $queryTimeInNs, $attributes);
+            Measure::manual('database query - '.$operationName, $queryTimeInNs, $attributes);
         });
     }
 }

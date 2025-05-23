@@ -15,5 +15,5 @@ test('the NeverSampler always returns false', function () {
 });
 
 test('the LotterySampler returns a boolean', function () {
-    expect(app(LotterySampler::class)->shouldSample())->toBeBool();
+    expect(new LotterySampler([50, 50]))->shouldSample()->toBeBool();
 });
