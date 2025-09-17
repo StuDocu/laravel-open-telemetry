@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spatie\OpenTelemetry\Tests\TestSupport;
 
+use OpenTelemetry\SDK\Common\Time\ClockFactory;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\OpenTelemetry\Drivers\MemoryDriver;
 use Spatie\OpenTelemetry\Facades\Measure;
@@ -12,6 +13,8 @@ use Spatie\OpenTelemetry\Support\IdGenerator;
 use Spatie\OpenTelemetry\Support\Samplers\AlwaysSampler;
 use Spatie\OpenTelemetry\Support\Samplers\Sampler;
 use Spatie\OpenTelemetry\Support\Stopwatch;
+use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeAttributeProvider;
+use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeClock;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeIdGenerator;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeStopwatch;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeTagsProvider;
@@ -27,10 +30,14 @@ class TestCase extends Orchestra
         parent::setUp();
 
         FakeIdGenerator::reset();
+        FakeClock::reset();
+        
+        // Set up the fake clock using OpenTelemetry's ClockFactory
+        ClockFactory::setDefault(new FakeClock());
 
         config()->set('open-telemetry.id_generator', FakeIdGenerator::class);
         config()->set('open-telemetry.stopwatch', FakeStopwatch::class);
-        config()->set('open-telemetry.trace_tag_providers', [FakeTagsProvider::class]);
+        config()->set('open-telemetry.trace_attribute_providers', [FakeAttributeProvider::class]);
 
         $this->app->bind(IdGenerator::class, config('open-telemetry.id_generator'));
         $this->app->bind(Stopwatch::class, config('open-telemetry.stopwatch'));

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Http;
 use Spatie\OpenTelemetry\Facades\Measure;
 use Spatie\OpenTelemetry\Support\Samplers\NeverSampler;
+use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeClock;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeIdGenerator;
 use Spatie\TestTime\TestTime;
 
@@ -17,6 +18,11 @@ beforeEach(function () {
 });
 
 it('can measure a single span', function () {
+    FakeClock::setTimestampQueue([
+        1747753696266177483, // first start
+        1747753696266257650, // first end
+    ]);
+
     Measure::start('first');
 
     TestTime::addSecond();
@@ -32,6 +38,12 @@ it('can measure a single span', function () {
 
 it('can measure multiple spans', function () {
     FakeIdGenerator::reset();
+    FakeClock::setTimestampQueue([
+        1747753696269910233, // first start
+        1747753696269969150, // first end
+        1747753696269972900, // second start
+        1747753696270018650, // second end
+    ]);
 
     Measure::start('first');
 
@@ -53,6 +65,13 @@ it('can measure multiple spans', function () {
 });
 
 it('can measure nested spans', function () {
+    FakeClock::setTimestampQueue([
+        1747753696242089317, // parent start
+        1747753696242241900, // child start  
+        1747753696242295775, // child end
+        1747753696242331692, // parent end
+    ]);
+
     Measure::start('parent');
 
     TestTime::addSecond();
@@ -87,5 +106,5 @@ it('will not send any payloads when we are not sampling', function () {
 
     $payloads = $this->sentRequestPayloads();
 
-    expect($payloads['sentSpans'])->toHaveCount(0);
+    expect($payloads)->toHaveCount(0);
 });
