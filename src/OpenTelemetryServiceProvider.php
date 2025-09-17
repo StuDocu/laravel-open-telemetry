@@ -17,7 +17,6 @@ use Spatie\OpenTelemetry\Support\Samplers\Sampler;
 use Spatie\OpenTelemetry\Support\Stopwatch;
 use Spatie\OpenTelemetry\Watchers\Watcher;
 
-use function array_key_first;
 use function collect;
 use function config;
 use function sprintf;
@@ -41,7 +40,7 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
         $this->app->singleton(Sampler::class, function () {
             $sampler = config('open-telemetry.sampler');
 
-            return $this->app->make(array_key_first($sampler), $sampler[array_key_first($sampler)]);
+            return $this->app->make($sampler);
         });
 
         $this->app->bind(IdGenerator::class, config('open-telemetry.id_generator'));
