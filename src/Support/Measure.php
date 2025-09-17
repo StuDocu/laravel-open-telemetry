@@ -67,6 +67,23 @@ class Measure
         return $this;
     }
 
+    public function setParentSpanId(string $parentSpanId): self
+    {
+        if (! $this->trace) {
+            return $this;
+        }
+
+        // Create a remote parent span with the specific ID from the traceparent header
+        $this->parentSpan = new Span(
+            name: 'remote-parent', // This name is not used, but it's required by the Span constructor
+            trace: $this->trace,
+            attributeProviders: [],
+            spanId: $parentSpanId
+        );
+
+        return $this;
+    }
+
     public function setDriver(Driver $driver): self
     {
         $this->driver = $driver;

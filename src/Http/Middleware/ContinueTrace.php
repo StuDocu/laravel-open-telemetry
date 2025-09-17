@@ -24,6 +24,7 @@ class ContinueTrace
         }
 
         Measure::setTraceId($parsedHeader->traceId);
+        Measure::setParentSpanId($parsedHeader->spanId);
 
         return $next($request);
     }

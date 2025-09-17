@@ -28,10 +28,11 @@ class Span
         public readonly ?Span $parentSpan = null,
         private ?int $startTime = null,
         private array $attributes = [],
+        ?string $spanId = null,
     ) {
         $this->startTime = $startTime ?? ClockFactory::getDefault()->now();
 
-        $this->id = app(IdGenerator::class)->spanId();
+        $this->id = $spanId ?? app(IdGenerator::class)->spanId();
 
         $this->attributes = array_merge(collect($this->attributeProviders)
             ->map(static fn (string $attributeProvider) => app($attributeProvider))
