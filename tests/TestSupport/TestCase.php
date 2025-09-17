@@ -17,7 +17,6 @@ use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeAttributeProvider;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeClock;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeIdGenerator;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeStopwatch;
-use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeTagsProvider;
 
 use function config;
 
@@ -31,9 +30,9 @@ class TestCase extends Orchestra
 
         FakeIdGenerator::reset();
         FakeClock::reset();
-        
+
         // Set up the fake clock using OpenTelemetry's ClockFactory
-        ClockFactory::setDefault(new FakeClock());
+        ClockFactory::setDefault(new FakeClock);
 
         config()->set('open-telemetry.id_generator', FakeIdGenerator::class);
         config()->set('open-telemetry.stopwatch', FakeStopwatch::class);

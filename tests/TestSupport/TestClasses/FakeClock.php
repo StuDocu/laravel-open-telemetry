@@ -9,6 +9,7 @@ use OpenTelemetry\API\Common\Time\ClockInterface;
 class FakeClock implements ClockInterface
 {
     private static array $timestampQueue = [];
+
     private static int $index = 0;
 
     public function now(): int
@@ -16,6 +17,7 @@ class FakeClock implements ClockInterface
         if (isset(self::$timestampQueue[self::$index])) {
             $timestamp = self::$timestampQueue[self::$index];
             self::$index++;
+
             return $timestamp;
         }
 

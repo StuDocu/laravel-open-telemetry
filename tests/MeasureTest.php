@@ -67,7 +67,7 @@ it('can measure multiple spans', function () {
 it('can measure nested spans', function () {
     FakeClock::setTimestampQueue([
         1747753696242089317, // parent start
-        1747753696242241900, // child start  
+        1747753696242241900, // child start
         1747753696242295775, // child end
         1747753696242331692, // parent end
     ]);
