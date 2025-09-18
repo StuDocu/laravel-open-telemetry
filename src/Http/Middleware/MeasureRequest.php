@@ -10,14 +10,14 @@ use Spatie\OpenTelemetry\Facades\Measure;
 
 class MeasureRequest
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         Measure::start('request');
 
         return $next($request);
     }
 
-    public function terminate($request, $response): void
+    public function terminate(Request $request, mixed $response): void
     {
         Measure::stop('request');
     }

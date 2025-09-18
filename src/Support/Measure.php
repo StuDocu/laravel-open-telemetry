@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spatie\OpenTelemetry\Support;
 
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use Spatie\OpenTelemetry\Drivers\Driver;
 
 use function array_keys;
@@ -99,7 +99,7 @@ class Measure
     /** @param array<string, mixed> $attributes */
     public function start(string $name, ?int $starTime = null, array $attributes = []): ?Span
     {
-        if (! $this->shouldSample) {
+        if (! $this->shouldSample || $this->trace === null) {
             return null;
         }
 
@@ -129,6 +129,9 @@ class Measure
         return $this->parentSpan;
     }
 
+    /**
+     * @return array<string>
+     */
     public function startedSpanNames(): array
     {
         return array_keys($this->startedSpans);
@@ -171,7 +174,7 @@ class Measure
     /** @param array<string, mixed> $attributes */
     public function manual(string $name, int $durationInNs, array $attributes = []): void
     {
-        $nowInNs = ClockFactory::getDefault()->now();
+        $nowInNs = Clock::getDefault()->now();
 
         $this->start($name, $nowInNs - $durationInNs, $attributes);
 

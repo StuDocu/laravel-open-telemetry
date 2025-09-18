@@ -47,7 +47,7 @@ test('the TraceparentHeaderSampler sampling behavior', function (?string $tracep
 
 test('sampler configuration works correctly', function ($config, $expectedClass) {
     config()->set('open-telemetry.sampler', $config);
-    
+
     // Re-bind the service provider to use the new configuration
     $this->rebindClasses();
 
@@ -61,7 +61,7 @@ test('sampler configuration works correctly', function ($config, $expectedClass)
 
 test('sampler configuration throws exception for invalid configurations', function ($config, $expectedMessage) {
     config()->set('open-telemetry.sampler', $config);
-    
+
     // Re-bind the service provider to use the new configuration
     $this->rebindClasses();
 

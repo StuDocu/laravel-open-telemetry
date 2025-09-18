@@ -19,7 +19,12 @@ class ContinueTrace
 
         $headerValue = $request->header('traceparent');
 
-        if (! $parsedHeader = ParsedTraceParentHeaderValue::make($headerValue)) {
+        if (!is_string($headerValue)) {
+            return $next($request);
+        }
+
+        $parsedHeader = ParsedTraceParentHeaderValue::make($headerValue);
+        if (! $parsedHeader) {
             return $next($request);
         }
 

@@ -8,7 +8,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\DbAttributes;
 use Spatie\OpenTelemetry\Facades\Measure;
 
 class QueryWatcher extends Watcher
@@ -20,11 +20,10 @@ class QueryWatcher extends Watcher
             $queryTimeInNs = (int) ($query->time * 1_000_000);
 
             $attributes = [
-                TraceAttributes::DB_SYSTEM => $query->connection->getDriverName(),
-                TraceAttributes::DB_NAME => $query->connection->getDatabaseName(),
-                TraceAttributes::DB_OPERATION => $operationName,
-                TraceAttributes::DB_USER => $query->connection->getConfig('username'),
-                TraceAttributes::DB_STATEMENT => $query->sql,
+                DbAttributes::DB_SYSTEM_NAME => $query->connection->getDriverName(),
+                DbAttributes::DB_NAMESPACE => $query->connection->getDatabaseName(),
+                DbAttributes::DB_OPERATION_NAME => $operationName,
+                DbAttributes::DB_QUERY_TEXT => $query->sql,
             ];
 
             Measure::manual('database query - '.$operationName, $queryTimeInNs, $attributes);

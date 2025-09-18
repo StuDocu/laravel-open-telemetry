@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spatie\OpenTelemetry\Tests\TestSupport;
 
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\OpenTelemetry\Drivers\MemoryDriver;
 use Spatie\OpenTelemetry\Facades\Measure;
@@ -31,8 +31,8 @@ class TestCase extends Orchestra
         FakeIdGenerator::reset();
         FakeClock::reset();
 
-        // Set up the fake clock using OpenTelemetry's ClockFactory
-        ClockFactory::setDefault(new FakeClock);
+        // Set up the fake clock using OpenTelemetry's Clock
+        Clock::setDefault(new FakeClock);
 
         config()->set('open-telemetry.id_generator', FakeIdGenerator::class);
         config()->set('open-telemetry.stopwatch', FakeStopwatch::class);

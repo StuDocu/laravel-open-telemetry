@@ -26,6 +26,6 @@ class TraceparentHeaderSampler implements Sampler
         $headerValue = $this->request->header('traceparent');
 
         // Validate that the traceparent header is properly formatted and valid
-        return ParsedTraceParentHeaderValue::make($headerValue) !== null;
+        return is_string($headerValue) && ParsedTraceParentHeaderValue::make($headerValue) !== null;
     }
 }
