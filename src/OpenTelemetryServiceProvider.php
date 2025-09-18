@@ -40,6 +40,17 @@ class OpenTelemetryServiceProvider extends PackageServiceProvider
         $this->app->singleton(Sampler::class, function () {
             $sampler = config('open-telemetry.sampler');
 
+            if (is_array($sampler)) {
+                if (count($sampler) !== 1) {
+                    throw new \InvalidArgumentException('Sampler array configuration must have exactly one key.');
+                }
+
+                $samplerClass = array_key_first($sampler);
+                $parameters = $sampler[$samplerClass];
+
+                return $this->app->makeWith($samplerClass, $parameters);
+            }
+
             return $this->app->make($sampler);
         });
 

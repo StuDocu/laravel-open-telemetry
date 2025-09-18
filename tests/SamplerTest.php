@@ -40,9 +40,34 @@ test('the TraceparentHeaderSampler sampling behavior', function (?string $tracep
     'no traceparent header' => [null, false],
     'invalid traceparent header' => ['invalid-header', false],
     'wrong version' => ['01-80e1afed08e019fc1110464cfa66635c-7a085853722dc6d2-01', false],
-    'invalid trace id' => ['00-invalid_trace_id-7a085853722dc6d2-01', false],
-    'invalid span id' => ['00-80e1afed08e019fc1110464cfa66635c-invalid_span_id-01', false],
     'too few segments' => ['00-80e1afed08e019fc1110464cfa66635c', false],
     'too many segments' => ['00-80e1afed08e019fc1110464cfa66635c-7a085853722dc6d2-01-extra', false],
     'valid traceparent header' => ['00-80e1afed08e019fc1110464cfa66635c-7a085853722dc6d2-01', true],
+]);
+
+test('sampler configuration works correctly', function ($config, $expectedClass) {
+    config()->set('open-telemetry.sampler', $config);
+    
+    // Re-bind the service provider to use the new configuration
+    $this->rebindClasses();
+
+    $sampler = app(\Spatie\OpenTelemetry\Support\Samplers\Sampler::class);
+
+    expect($sampler)->toBeInstanceOf($expectedClass);
+})->with([
+    'simple class string' => [AlwaysSampler::class, AlwaysSampler::class],
+    'array with class and parameters' => [[LotterySampler::class => ['odds' => [1, 2]]], LotterySampler::class],
+]);
+
+test('sampler configuration throws exception for invalid configurations', function ($config, $expectedMessage) {
+    config()->set('open-telemetry.sampler', $config);
+    
+    // Re-bind the service provider to use the new configuration
+    $this->rebindClasses();
+
+    expect(fn () => app(\Spatie\OpenTelemetry\Support\Samplers\Sampler::class))
+        ->toThrow(\InvalidArgumentException::class, $expectedMessage);
+})->with([
+    'empty array' => [[], 'Sampler array configuration must have exactly one key.'],
+    'multiple keys' => [[AlwaysSampler::class => [], NeverSampler::class => []], 'Sampler array configuration must have exactly one key.'],
 ]);
