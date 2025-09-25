@@ -66,7 +66,7 @@ class SpanFormatter
         $formattedSpan = [
             'traceId' => $span->trace->id(),
             'spanId' => $span->id,
-            'parentSpanId' => $span->parentSpan?->id ?? '',
+            'parentSpanId' => $span->parentSpan->id ?? '',
             'name' => $span->name,
             'startTimeUnixNano' => $span->getStartTime(),
             'endTimeUnixNano' => $span->getEndTime(),
