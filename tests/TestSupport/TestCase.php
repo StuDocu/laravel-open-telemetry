@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spatie\OpenTelemetry\Tests\TestSupport;
 
+use Illuminate\Testing\TestResponse;
 use OpenTelemetry\API\Common\Time\Clock;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\OpenTelemetry\Drivers\MemoryDriver;
@@ -23,6 +24,8 @@ use function config;
 class TestCase extends Orchestra
 {
     protected MemoryDriver $memoryDriver;
+
+    protected static ?TestResponse $latestResponse = null;
 
     protected function setUp(): void
     {
