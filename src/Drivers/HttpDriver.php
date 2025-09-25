@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Spatie\OpenTelemetry\Drivers;
 
-use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Http;
 use Spatie\OpenTelemetry\Support\Formatters\SpanFormatter;
-
-use function array_key_exists;
 
 class HttpDriver implements Driver
 {

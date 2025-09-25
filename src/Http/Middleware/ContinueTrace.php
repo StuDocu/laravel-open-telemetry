@@ -19,7 +19,7 @@ class ContinueTrace
 
         $headerValue = $request->header('traceparent');
 
-        if (!is_string($headerValue)) {
+        if (! is_string($headerValue)) {
             return $next($request);
         }
 
