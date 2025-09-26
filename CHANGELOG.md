@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-open-telemetry` will be documented in this file.
 
+## v1.1.0: traceparent - 2025-09-26
+
+### What's Changed
+
+* feat: add full support for `traceparent` by @juampi92 in https://github.com/StuDocu/laravel-open-telemetry/pull/2
+
+### New Contributors
+
+* @juampi92 made their first contribution in https://github.com/StuDocu/laravel-open-telemetry/pull/2
+
+**Full Changelog**: https://github.com/StuDocu/laravel-open-telemetry/compare/v1...v1.1.0
+
 ## v1 - 2025-09-18
 
 First release
