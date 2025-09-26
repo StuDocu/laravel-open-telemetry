@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-open-telemetry` will be documented in this file.
 
+## v1 - 2025-09-18
+
+First release
+
 ## 0.0.11 - 2025-02-21
 
 ### What's Changed
