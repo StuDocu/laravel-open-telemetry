@@ -14,7 +14,7 @@ class ParsedTraceParentHeaderValue
 {
     public static function make(string $headerValue): ?self
     {
-        if (self::isValidHeaderValue($headerValue)) {
+        if (! self::isValidHeaderValue($headerValue)) {
             return null;
         }
 
@@ -47,6 +47,6 @@ class ParsedTraceParentHeaderValue
 
     public static function isValidHeaderValue(string $headerValue): bool
     {
-        return substr_count($headerValue, '-') !== 3;
+        return substr_count($headerValue, '-') === 3;
     }
 }

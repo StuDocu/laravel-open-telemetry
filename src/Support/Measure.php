@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spatie\OpenTelemetry\Support;
 
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use Spatie\OpenTelemetry\Drivers\Driver;
 
 use function array_keys;
@@ -67,6 +67,23 @@ class Measure
         return $this;
     }
 
+    public function setParentSpanId(string $parentSpanId): self
+    {
+        if (! $this->trace) {
+            return $this;
+        }
+
+        // Create a remote parent span with the specific ID from the traceparent header
+        $this->parentSpan = new Span(
+            name: 'remote-parent', // This name is not used, but it's required by the Span constructor
+            trace: $this->trace,
+            attributeProviders: [],
+            spanId: $parentSpanId
+        );
+
+        return $this;
+    }
+
     public function setDriver(Driver $driver): self
     {
         $this->driver = $driver;
@@ -82,7 +99,7 @@ class Measure
     /** @param array<string, mixed> $attributes */
     public function start(string $name, ?int $starTime = null, array $attributes = []): ?Span
     {
-        if (! $this->shouldSample) {
+        if (! $this->shouldSample || $this->trace === null) {
             return null;
         }
 
@@ -112,6 +129,9 @@ class Measure
         return $this->parentSpan;
     }
 
+    /**
+     * @return array<string>
+     */
     public function startedSpanNames(): array
     {
         return array_keys($this->startedSpans);
@@ -154,7 +174,7 @@ class Measure
     /** @param array<string, mixed> $attributes */
     public function manual(string $name, int $durationInNs, array $attributes = []): void
     {
-        $nowInNs = ClockFactory::getDefault()->now();
+        $nowInNs = Clock::getDefault()->now();
 
         $this->start($name, $nowInNs - $durationInNs, $attributes);
 

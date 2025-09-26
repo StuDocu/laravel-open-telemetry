@@ -16,11 +16,11 @@ class RequestWatcher extends Watcher
         Measure::start('request');
 
         $app->terminating(static function (): void {
-            $start = LARAVEL_START * 1_000_000;
+            $start = (int) LARAVEL_START * 1_000_000;
 
             $duration = now()->getPreciseTimestamp() - $start;
 
-            Measure::stop('request', [
+            Measure::stop('request', attributes: [
                 'timestamp' => $start,
                 'duration' => $duration,
             ]);

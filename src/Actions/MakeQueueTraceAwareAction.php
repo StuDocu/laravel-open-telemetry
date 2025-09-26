@@ -124,7 +124,10 @@ class MakeQueueTraceAwareAction
         return config('open-telemetry.queue.all_jobs_are_trace_aware_by_default') === true;
     }
 
-    protected function getEventPayload($event): ?array
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function getEventPayload(object $event): ?array
     {
         return match (true) {
             $event instanceof JobProcessing => $event->job->payload(),
@@ -140,7 +143,7 @@ class MakeQueueTraceAwareAction
         Measure::start($jobName);
     }
 
-    protected function jobName(object $job): string
+    protected function jobName(Job $job): string
     {
         return $job->payload()['displayName'];
     }

@@ -32,9 +32,7 @@ return [
      * This class determines if your measurements should actually be sent
      * to the reporting drivers.
      */
-    'sampler' => [
-        AlwaysSampler::class => [],
-    ],
+    'sampler' => AlwaysSampler::class,
 
     /*
      * Attributes can be added to any measurement. These classes will determine the

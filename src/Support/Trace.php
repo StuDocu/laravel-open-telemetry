@@ -10,26 +10,31 @@ use function app;
 use function collect;
 use function config;
 
+/**
+ * @phpstan-import-type AttributesArray from AttributeProvider
+ */
 class Trace
 {
-    /** @var array<string, mixed> */
+    /** @var AttributesArray */
     protected array $attributes = [];
+
+    protected string $id;
 
     public static function start(?string $id = null, string $name = ''): self
     {
         return new self($id, $name, config('open-telemetry.trace_attribute_providers'));
     }
 
-    /** @param  array<AttributeProvider> $attributeProviders */
+    /** @param  array<AttributeProvider|class-string<AttributeProvider>> $attributeProviders */
     public function __construct(
-        protected ?string $id,
+        ?string $id,
         protected ?string $name,
         array $attributeProviders,
     ) {
-        $this->id ??= app(IdGenerator::class)->traceId();
+        $this->id = $id ?? app(IdGenerator::class)->traceId();
 
         $this->attributes = collect($attributeProviders)
-            ->map(static fn (string $attributeProvider) => app($attributeProvider))
+            ->map(static fn (AttributeProvider|string $attributeProvider) => is_string($attributeProvider) ? app($attributeProvider) : $attributeProvider)
             ->flatMap(static fn (AttributeProvider $attributeProvider) => $attributeProvider->attributes())
             ->toArray();
     }
@@ -51,11 +56,12 @@ class Trace
         return $this;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
+    /** @return AttributesArray */
     public function getAttributes(): array
     {
         return $this->attributes;

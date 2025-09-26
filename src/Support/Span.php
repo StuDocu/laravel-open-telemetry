@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Spatie\OpenTelemetry\Support;
 
-use OpenTelemetry\SDK\Common\Time\ClockFactory;
+use OpenTelemetry\API\Common\Time\Clock;
 use Spatie\OpenTelemetry\Support\AttributeProviders\AttributeProvider;
 
 use function app;
 use function array_merge;
 use function collect;
 
+/**
+ * @phpstan-import-type AttributesArray from AttributeProvider
+ */
 class Span
 {
     public readonly string $id;
@@ -18,7 +21,7 @@ class Span
     private ?int $endTime = null;
 
     /**
-     * @param  array<AttributeProvider>  $attributeProviders
+     * @param  array<class-string<AttributeProvider>>  $attributeProviders
      * @param  array<string, scalar>  $attributes  Custom key-value attributes to be attached to the span.
      */
     public function __construct(
@@ -28,13 +31,14 @@ class Span
         public readonly ?Span $parentSpan = null,
         private ?int $startTime = null,
         private array $attributes = [],
+        ?string $spanId = null,
     ) {
-        $this->startTime = $startTime ?? ClockFactory::getDefault()->now();
+        $this->startTime = $startTime ?? Clock::getDefault()->now();
 
-        $this->id = app(IdGenerator::class)->spanId();
+        $this->id = $spanId ?? app(IdGenerator::class)->spanId();
 
         $this->attributes = array_merge(collect($this->attributeProviders)
-            ->map(static fn (string $attributeProvider) => app($attributeProvider))
+            ->map(static fn (string $attributeProvider): AttributeProvider => app($attributeProvider))
             ->flatMap(static fn (AttributeProvider $attributeProvider) => $attributeProvider->attributes())
             ->toArray(), $attributes);
     }
@@ -47,14 +51,14 @@ class Span
     /** @param array<string, scalar> $attributes */
     public function stop(?int $stopTime = null, array $attributes = []): self
     {
-        $this->endTime = $stopTime ?? ClockFactory::getDefault()->now();
+        $this->endTime = $stopTime ?? Clock::getDefault()->now();
 
         $this->attributes = array_merge($this->attributes, $attributes);
 
         return $this;
     }
 
-    /** @param array<string, scalar> $attributes */
+    /** @param AttributesArray $attributes */
     public function attributes(array $attributes): self
     {
         $this->attributes = array_merge($this->attributes, $attributes);
@@ -62,7 +66,7 @@ class Span
         return $this;
     }
 
-    /** @return array<string, scalar> */
+    /** @return AttributesArray */
     public function getAttributes(): array
     {
         return $this->attributes;
