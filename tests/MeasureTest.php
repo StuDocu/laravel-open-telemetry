@@ -9,7 +9,7 @@ use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeClock;
 use Spatie\OpenTelemetry\Tests\TestSupport\TestClasses\FakeIdGenerator;
 use Spatie\TestTime\TestTime;
 
-use function Spatie\Snapshots\assertMatchesSnapshot;
+use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 
 beforeEach(function () {
     TestTime::freeze('Y-m-d H:i:s', '2022-01-01 00:00:00');
@@ -33,7 +33,7 @@ it('can measure a single span', function () {
 
     $payloads = $this->sentRequestPayloads();
 
-    assertMatchesSnapshot($payloads);
+    assertMatchesJsonSnapshot(snapshotablePayloads($payloads));
 });
 
 it('can measure multiple spans', function () {
@@ -61,7 +61,7 @@ it('can measure multiple spans', function () {
 
     $payloads = $this->sentRequestPayloads();
 
-    assertMatchesSnapshot($payloads);
+    assertMatchesJsonSnapshot(snapshotablePayloads($payloads));
 });
 
 it('can measure nested spans', function () {
@@ -90,7 +90,7 @@ it('can measure nested spans', function () {
 
     $payloads = $this->sentRequestPayloads();
 
-    assertMatchesSnapshot($payloads);
+    assertMatchesJsonSnapshot(snapshotablePayloads($payloads));
 });
 
 it('will not send any payloads when we are not sampling', function () {

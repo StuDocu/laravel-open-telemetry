@@ -1,0 +1,32 @@
+[
+    {
+        "id": "1",
+        "name": "child",
+        "startTime": 1747753696242241900,
+        "endTime": 1747753696242295775,
+        "attributes": [],
+        "trace": {
+            "id": "0",
+            "name": "Laravel",
+            "attributes": {
+                "host.name": "static.host.name.for.tests"
+            }
+        },
+        "parentSpanId": "0"
+    },
+    {
+        "id": "0",
+        "name": "parent",
+        "startTime": 1747753696242089317,
+        "endTime": 1747753696242331692,
+        "attributes": [],
+        "trace": {
+            "id": "0",
+            "name": "Laravel",
+            "attributes": {
+                "host.name": "static.host.name.for.tests"
+            }
+        },
+        "parentSpanId": null
+    }
+]
