@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spatie\OpenTelemetry\Drivers;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Spatie\OpenTelemetry\Support\Formatters\SpanFormatter;
 
@@ -26,7 +27,7 @@ class HttpDriver implements Driver
             ->withHeaders($this->options['headers'] ?? [])
             ->when(
                 $basicAuth,
-                function (\Illuminate\Http\Client\PendingRequest $client) use ($basicAuth) {
+                function (PendingRequest $client) use ($basicAuth) {
                     /** @var array{username: string, password: string} $basicAuth */
                     $client->withBasicAuth(
                         $basicAuth['username'],

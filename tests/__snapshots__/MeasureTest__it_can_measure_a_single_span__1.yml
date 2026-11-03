@@ -1,9 +1,0 @@
--
-    attributes: {  }
-    startTime: 1747753696266177483
-    endTime: 1747753696266257650
-    id: '0'
-    name: first
-    trace: { name: Laravel, attributes: { host.name: static.host.name.for.tests } }
-    attributeProviders: {  }
-    parentSpan: null

@@ -17,13 +17,18 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         php: [8.2, 8.3, 8.4]
-        laravel: ['11.*', '12.*']
+        laravel: ['11.*', '12.*', '13.*']
         stability: [prefer-lowest, prefer-stable]
+        exclude:
+          - laravel: 13.*
+            php: 8.2
         include:
           - laravel: 11.*
             testbench: 9.*
           - laravel: 12.*
             testbench: 10.*
+          - laravel: 13.*
+            testbench: 11.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -45,6 +50,11 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # Laravel 11 no longer gets security fixes. It is tested on purpose, so Composer may install it despite its
+          # advisories. Supported versions keep the default blocking.
+          if [[ "${{ matrix.laravel }}" == 11.* ]]; then
+            export COMPOSER_NO_SECURITY_BLOCKING=1
+          fi
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
@@ -52,4 +62,4 @@ jobs:
         run: composer show -D
 
       - name: Execute tests
-        run: vendor/bin/pest
+        run: vendor/bin/pest --no-coverage

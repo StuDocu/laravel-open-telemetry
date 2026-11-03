@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Spatie\OpenTelemetry\Support\Samplers\AlwaysSampler;
 use Spatie\OpenTelemetry\Support\Samplers\LotterySampler;
 use Spatie\OpenTelemetry\Support\Samplers\NeverSampler;
+use Spatie\OpenTelemetry\Support\Samplers\Sampler;
 use Spatie\OpenTelemetry\Support\Samplers\TraceparentHeaderSampler;
 
 test('the AlwaysSampler always returns true', function () {
@@ -51,7 +52,7 @@ test('sampler configuration works correctly', function ($config, $expectedClass)
     // Re-bind the service provider to use the new configuration
     $this->rebindClasses();
 
-    $sampler = app(\Spatie\OpenTelemetry\Support\Samplers\Sampler::class);
+    $sampler = app(Sampler::class);
 
     expect($sampler)->toBeInstanceOf($expectedClass);
 })->with([
@@ -65,8 +66,8 @@ test('sampler configuration throws exception for invalid configurations', functi
     // Re-bind the service provider to use the new configuration
     $this->rebindClasses();
 
-    expect(fn () => app(\Spatie\OpenTelemetry\Support\Samplers\Sampler::class))
-        ->toThrow(\InvalidArgumentException::class, $expectedMessage);
+    expect(fn () => app(Sampler::class))
+        ->toThrow(InvalidArgumentException::class, $expectedMessage);
 })->with([
     'empty array' => [[], 'Sampler array configuration must have exactly one key.'],
     'multiple keys' => [[AlwaysSampler::class => [], NeverSampler::class => []], 'Sampler array configuration must have exactly one key.'],
