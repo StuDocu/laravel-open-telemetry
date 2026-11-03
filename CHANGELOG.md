@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-open-telemetry` will be documented in this file.
 
+## v1.1.1 - 2026-11-03
+
+Allows Laravel 13 (`illuminate/contracts` and `illuminate/http` `^13.0`). Laravel 11 and 12 still work. Fixes the MeasureTest snapshots and the CI.
+
 ## v1.1.0: traceparent - 2025-09-26
 
 ### What's Changed
